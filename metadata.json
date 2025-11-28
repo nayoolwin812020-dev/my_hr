@@ -1,0 +1,7 @@
+{
+  "name": "Copy of OrgAttendance AI",
+  "description": "A comprehensive attendance management system with QR scanning, photo verification, payroll insights, and leave management.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
