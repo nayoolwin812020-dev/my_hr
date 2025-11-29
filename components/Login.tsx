@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Shield, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 
@@ -21,50 +22,50 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col items-center justify-center p-4 transition-colors">
-      <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center p-4 transition-colors">
+      <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 dark:shadow-blue-900/20 mb-4 transform rotate-3">
             <Shield size={32} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome Back</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Sign in to your organization account</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Welcome Back</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Sign in to your organization account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 ml-1">Email Address</label>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
             <div className="relative">
               <input
                 type="email"
                 required
-                className="w-full p-3.5 pl-11 bg-gray-50 dark:bg-slate-700/50 text-gray-900 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium placeholder:text-gray-400"
+                className="w-full p-3.5 pl-11 bg-slate-50 hover:bg-white focus:bg-white dark:bg-slate-700/50 text-slate-900 dark:text-white rounded-xl border border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium placeholder:text-slate-400"
                 placeholder="name@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={20} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 ml-1">Password</label>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 ml-1">Password</label>
             <div className="relative">
               <input
                 type="password"
                 required
-                className="w-full p-3.5 pl-11 bg-gray-50 dark:bg-slate-700/50 text-gray-900 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium placeholder:text-gray-400"
+                className="w-full p-3.5 pl-11 bg-slate-50 hover:bg-white focus:bg-white dark:bg-slate-700/50 text-slate-900 dark:text-white rounded-xl border border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium placeholder:text-slate-400"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={20} />
             </div>
           </div>
 
           <div className="flex items-center justify-between text-xs">
-            <label className="flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-400">
-              <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+            <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400">
+              <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
               Remember me
             </label>
             <a href="#" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">Forgot Password?</a>
@@ -85,13 +86,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </button>
         </form>
 
-        <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-8">
+        <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-8">
           Don't have an account? <span className="text-blue-600 dark:text-blue-400 font-medium cursor-pointer">Contact HR</span>
         </p>
       </div>
       
       <div className="mt-8 text-center">
-         <p className="text-xs text-gray-400 dark:text-gray-500">Demo Credentials: Any email & password</p>
+         <p className="text-xs text-slate-400 dark:text-slate-500">Demo Credentials: Any email & password</p>
       </div>
     </div>
   );

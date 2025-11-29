@@ -126,17 +126,17 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
         <div 
             key={day} 
             onClick={() => leaveInfo && setShowDetailModal({ day, ...leaveInfo })}
-            className={`h-14 sm:h-20 border-t border-r border-gray-100 dark:border-slate-700 relative p-1 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors ${isToday ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
+            className={`h-14 sm:h-20 border-t border-r border-slate-100 dark:border-slate-700 relative p-1 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${isToday ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
         >
-          <span className={`text-xs font-medium ${isToday ? 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 w-6 h-6 flex items-center justify-center rounded-full' : 'text-gray-700 dark:text-gray-300'}`}>
+          <span className={`text-xs font-medium ${isToday ? 'text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 w-6 h-6 flex items-center justify-center rounded-full' : 'text-slate-700 dark:text-slate-300'}`}>
             {day}
           </span>
           
           {leaveInfo && (
             <div className={`mt-1 text-[10px] sm:text-xs rounded px-1 py-0.5 truncate font-medium
-                ${leaveInfo.type === 'ABSENT' ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' : 
-                  leaveInfo.type === 'TEAM_LEAVE' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' :
-                  leaveInfo.data.status === 'APPROVED' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300'}
+                ${leaveInfo.type === 'ABSENT' ? 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300' : 
+                  leaveInfo.type === 'TEAM_LEAVE' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300' :
+                  leaveInfo.data.status === 'APPROVED' ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300'}
             `}>
               {leaveInfo.type === 'ABSENT' ? 'Absent' : leaveInfo.type === 'TEAM_LEAVE' ? `User ${leaveInfo.data.userId}` : leaveInfo.data.type}
             </div>
@@ -151,7 +151,7 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
   return (
     <div className="p-4 space-y-6 pb-24 relative min-h-screen">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
            <CalendarIcon className="text-blue-600" />
            {userRole === UserRole.ADMIN ? 'Team Calendar' : 'My Calendar'}
         </h2>
@@ -166,23 +166,23 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
       </div>
 
       {/* Calendar Header */}
-      <div className="bg-white dark:bg-slate-800 rounded-t-2xl p-4 flex items-center justify-between border-b border-gray-100 dark:border-slate-700">
-         <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-600 dark:text-gray-300">
+      <div className="bg-white dark:bg-slate-800 rounded-t-2xl p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-700">
+         <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-600 dark:text-slate-300">
             <ChevronLeft size={20} />
          </button>
-         <h3 className="font-bold text-lg text-gray-800 dark:text-white">
+         <h3 className="font-bold text-lg text-slate-800 dark:text-white">
             {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
          </h3>
-         <button onClick={() => changeMonth(1)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-600 dark:text-gray-300">
+         <button onClick={() => changeMonth(1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-600 dark:text-slate-300">
             <ChevronRight size={20} />
          </button>
       </div>
 
       {/* Calendar Grid */}
-      <div className="bg-white dark:bg-slate-800 rounded-b-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
-         <div className="grid grid-cols-7 bg-gray-50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700">
+      <div className="bg-white dark:bg-slate-800 rounded-b-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+         <div className="grid grid-cols-7 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="py-2 text-center text-xs font-semibold text-gray-400 dark:text-gray-500">
+                <div key={day} className="py-2 text-center text-xs font-semibold text-slate-500 dark:text-slate-500">
                     {day}
                 </div>
             ))}
@@ -195,18 +195,18 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
       {/* Leave Balances (Compact) */}
       {userRole === UserRole.EMPLOYEE && (
         <div className="flex gap-3 overflow-x-auto no-scrollbar pt-2">
-            <div className="flex-shrink-0 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center gap-3">
+            <div className="flex-shrink-0 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-3">
                <div className="w-2 h-8 bg-blue-500 rounded-full"></div>
                <div>
-                 <div className="text-xs text-gray-500 dark:text-gray-400">Casual</div>
-                 <div className="font-bold text-gray-800 dark:text-white">8/12</div>
+                 <div className="text-xs text-slate-500 dark:text-slate-400">Casual</div>
+                 <div className="font-bold text-slate-800 dark:text-white">8/12</div>
                </div>
             </div>
-            <div className="flex-shrink-0 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center gap-3">
+            <div className="flex-shrink-0 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-3">
                <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
                <div>
-                 <div className="text-xs text-gray-500 dark:text-gray-400">Sick</div>
-                 <div className="font-bold text-gray-800 dark:text-white">5/7</div>
+                 <div className="text-xs text-slate-500 dark:text-slate-400">Sick</div>
+                 <div className="font-bold text-slate-800 dark:text-white">5/7</div>
                </div>
             </div>
         </div>
@@ -217,10 +217,10 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setShowDetailModal(null)}>
             <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                         {showDetailModal.type === 'ABSENT' ? 'Absence Record' : 'Leave Details'}
                     </h3>
-                    <button onClick={() => setShowDetailModal(null)} className="text-gray-400 hover:text-gray-600">
+                    <button onClick={() => setShowDetailModal(null)} className="text-slate-400 hover:text-slate-600">
                         <X size={20} />
                     </button>
                 </div>
@@ -228,8 +228,8 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
                 {showDetailModal.type === 'ABSENT' ? (
                     <div className="text-center py-6">
                         <XCircle size={48} className="text-red-500 mx-auto mb-3" />
-                        <p className="text-gray-800 dark:text-white font-medium">Marked Absent</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">No check-in record found for this date.</p>
+                        <p className="text-slate-800 dark:text-white font-medium">Marked Absent</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">No check-in record found for this date.</p>
                         <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-700 dark:text-red-300 text-sm">
                             Daily Rate Deducted
                         </div>
@@ -237,27 +237,27 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
                 ) : (
                     <div className="space-y-4">
                         <div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Status</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">Status</span>
                             <div className={`mt-1 inline-flex px-2 py-1 rounded-full text-xs font-bold ${
-                                showDetailModal.data.status === 'APPROVED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                showDetailModal.data.status === 'APPROVED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                             }`}>
                                 {showDetailModal.data.status}
                             </div>
                         </div>
                         <div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Type</span>
-                            <div className="font-medium text-gray-800 dark:text-white">{showDetailModal.data.type}</div>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">Type</span>
+                            <div className="font-medium text-slate-800 dark:text-white">{showDetailModal.data.type}</div>
                         </div>
                         <div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Duration</span>
-                            <div className="font-medium text-gray-800 dark:text-white">
+                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">Duration</span>
+                            <div className="font-medium text-slate-800 dark:text-white">
                                 {showDetailModal.data.startDate} - {showDetailModal.data.endDate}
-                                <span className="ml-2 text-sm text-gray-500">({showDetailModal.data.days} days)</span>
+                                <span className="ml-2 text-sm text-slate-500">({showDetailModal.data.days} days)</span>
                             </div>
                         </div>
                         <div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Reason</span>
-                            <div className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 italic">
+                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">Reason</span>
+                            <div className="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 italic">
                                 "{showDetailModal.data.reason}"
                             </div>
                         </div>
@@ -269,7 +269,7 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
                                >Approve</button>
                                <button 
                                  onClick={() => { handleTeamAction(showDetailModal.data.id, 'REJECTED'); setShowDetailModal(null); }}
-                                 className="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg text-sm font-medium"
+                                 className="flex-1 bg-slate-200 text-slate-800 py-2 rounded-lg text-sm font-medium"
                                >Reject</button>
                            </div>
                         )}
@@ -287,12 +287,12 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Request Leave</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Fill in the details below</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Request Leave</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Fill in the details below</p>
               </div>
               <button 
                 onClick={() => setShowForm(false)} 
-                className="p-2 bg-gray-50 dark:bg-slate-700 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 bg-slate-50 dark:bg-slate-700 text-slate-400 dark:text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
               >
                 <X size={20} />
               </button>
@@ -302,10 +302,10 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
               
               {/* Leave Type Dropdown */}
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Leave Type</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Leave Type</label>
                 <div className="relative">
                   <select 
-                    className="w-full p-3.5 pl-4 pr-10 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none appearance-none transition-all font-medium"
+                    className="w-full p-3.5 pl-4 pr-10 bg-slate-50 hover:bg-white focus:bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl border border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none appearance-none transition-all font-medium"
                     value={leaveType}
                     onChange={(e) => setLeaveType(e.target.value)}
                   >
@@ -314,61 +314,61 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
                     <option value="PERSONAL">🏠 Personal</option>
                     <option value="MATERNITY">👶 Maternity/Paternity</option>
                   </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
                 </div>
               </div>
 
               {/* Date Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Start Date</label>
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Start Date</label>
                   <div className="relative">
                     <input 
                       type="date" 
                       required
-                      className="w-full p-3.5 pl-10 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium"
+                      className="w-full p-3.5 pl-10 bg-slate-50 hover:bg-white focus:bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl border border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                     />
-                    <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                    <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">End Date</label>
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">End Date</label>
                   <div className="relative">
                     <input 
                       type="date" 
-                      className="w-full p-3.5 pl-10 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium"
+                      className="w-full p-3.5 pl-10 bg-slate-50 hover:bg-white focus:bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl border border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                     />
-                    <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                    <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
                   </div>
                 </div>
               </div>
 
               {/* Duration */}
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Total Days</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Total Days</label>
                 <div className="relative">
                    <input
                       type="number"
                       min="0.5"
                       step="0.5"
                       required
-                      className="w-full p-3.5 pl-10 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium"
+                      className="w-full p-3.5 pl-10 bg-slate-50 hover:bg-white focus:bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl border border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium"
                       value={days}
                       onChange={(e) => setDays(e.target.value)}
                       placeholder="e.g. 1"
                   />
-                  <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                  <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
                 </div>
               </div>
 
               {/* Reason Area */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Reason</label>
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Reason</label>
                   <button 
                     type="button"
                     onClick={handleAiDraft}
@@ -383,12 +383,12 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
                   <textarea 
                     required
                     rows={3}
-                    className="w-full p-3.5 pl-10 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all resize-none font-medium"
+                    className="w-full p-3.5 pl-10 bg-slate-50 hover:bg-white focus:bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl border border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all resize-none font-medium"
                     placeholder="Briefly describe why you need leave..."
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                   />
-                  <FileText className="absolute left-3.5 top-4 text-gray-400 pointer-events-none" size={18} />
+                  <FileText className="absolute left-3.5 top-4 text-slate-400 pointer-events-none" size={18} />
                 </div>
               </div>
 
@@ -397,7 +397,7 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
                 <button 
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="py-3.5 rounded-xl font-semibold text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-600 active:scale-95 transition-all"
+                  className="py-3.5 rounded-xl font-semibold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 active:scale-95 transition-all"
                 >
                   Cancel
                 </button>

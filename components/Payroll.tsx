@@ -88,13 +88,13 @@ const Payroll: React.FC<PayrollProps> = ({ history, userRole = UserRole.EMPLOYEE
       </div>
 
       {/* Admin Chart */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 transition-colors">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-white flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-slate-700 dark:text-white flex items-center gap-2">
             <TrendingUp size={16} className="text-blue-600 dark:text-blue-400" />
             Expenditure Trend
           </h3>
-          <span className="text-[10px] text-gray-400 dark:text-gray-500">Last 4 Weeks</span>
+          <span className="text-[10px] text-slate-400 dark:text-gray-500">Last 4 Weeks</span>
         </div>
         <div className="h-48 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -105,8 +105,8 @@ const Payroll: React.FC<PayrollProps> = ({ history, userRole = UserRole.EMPLOYEE
                   <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-              <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} tick={{fill: '#9ca3af'}} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
               <Tooltip 
                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: 'var(--tooltip-bg, #fff)' }}
                 cursor={{ stroke: '#3b82f6', strokeWidth: 1 }}
@@ -138,9 +138,9 @@ const Payroll: React.FC<PayrollProps> = ({ history, userRole = UserRole.EMPLOYEE
             {summary.netPay.toLocaleString()}
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 transition-colors">
-          <div className="text-gray-500 dark:text-gray-400 text-xs font-medium mb-1">Total Hours</div>
-          <div className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-1">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
+          <div className="text-slate-500 dark:text-slate-400 text-xs font-medium mb-1">Total Hours</div>
+          <div className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-1">
             <Clock size={20} className="text-orange-500" />
             {summary.totalHours}
           </div>
@@ -148,28 +148,28 @@ const Payroll: React.FC<PayrollProps> = ({ history, userRole = UserRole.EMPLOYEE
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 transition-colors">
-          <div className="text-gray-500 dark:text-gray-400 text-xs font-medium mb-1">Overtime</div>
-          <div className="text-xl font-bold text-gray-800 dark:text-white">{summary.overtimeHours} hrs</div>
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
+          <div className="text-slate-500 dark:text-slate-400 text-xs font-medium mb-1">Overtime</div>
+          <div className="text-xl font-bold text-slate-800 dark:text-white">{summary.overtimeHours} hrs</div>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 transition-colors">
-          <div className="text-gray-500 dark:text-gray-400 text-xs font-medium mb-1">Deductions</div>
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
+          <div className="text-slate-500 dark:text-slate-400 text-xs font-medium mb-1">Deductions</div>
           <div className="text-xl font-bold text-red-600 dark:text-red-400">-${summary.deductions}</div>
         </div>
       </div>
 
       {/* Chart */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 transition-colors">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-4">Weekly Earnings</h3>
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
+        <h3 className="text-sm font-semibold text-slate-700 dark:text-white mb-4">Weekly Earnings</h3>
         <div className="h-48 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={PAYROLL_DATA}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" strokeOpacity={0.2} />
-              <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} tick={{fill: '#9ca3af'}} />
+              <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
               <YAxis hide />
               <Tooltip 
                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', color: 'black' }}
-                cursor={{ fill: '#f3f4f6', opacity: 0.1 }}
+                cursor={{ fill: '#f1f5f9', opacity: 0.5 }}
               />
               <Bar dataKey="pay" fill="#2563eb" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -208,7 +208,7 @@ const Payroll: React.FC<PayrollProps> = ({ history, userRole = UserRole.EMPLOYEE
 
   return (
     <div className="p-4 space-y-6 pb-24">
-      <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+      <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
         {userRole === UserRole.ADMIN ? (
             <>
                 <Briefcase size={24} className="text-slate-700 dark:text-slate-300" /> Department Payroll

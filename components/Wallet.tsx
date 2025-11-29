@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { User, AttendanceRecord } from '../types';
 import { Wallet as WalletIcon, TrendingUp, DollarSign, Award, ArrowUpRight, ArrowDownRight, CreditCard } from 'lucide-react';
@@ -23,7 +22,7 @@ const Wallet: React.FC<WalletProps> = ({ user, history }) => {
 
   return (
     <div className="p-4 space-y-6 pb-24">
-      <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+      <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
         <WalletIcon className="text-blue-600" /> My Wallet
       </h2>
 
@@ -56,34 +55,34 @@ const Wallet: React.FC<WalletProps> = ({ user, history }) => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
             <div className="flex items-center gap-2 mb-2 text-green-600 dark:text-green-400">
                 <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-full">
                     <ArrowUpRight size={16} />
                 </div>
                 <span className="text-xs font-bold uppercase">Earned</span>
             </div>
-            <div className="text-xl font-bold text-gray-800 dark:text-white">${calculateTotalEarned()}</div>
-            <div className="text-[10px] text-gray-400">From attendance</div>
+            <div className="text-xl font-bold text-slate-800 dark:text-white">${calculateTotalEarned()}</div>
+            <div className="text-[10px] text-slate-400">From attendance</div>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
             <div className="flex items-center gap-2 mb-2 text-red-600 dark:text-red-400">
                 <div className="p-1.5 bg-red-100 dark:bg-red-900/30 rounded-full">
                     <ArrowDownRight size={16} />
                 </div>
                 <span className="text-xs font-bold uppercase">Spent</span>
             </div>
-            <div className="text-xl font-bold text-gray-800 dark:text-white">$200.00</div>
-            <div className="text-[10px] text-gray-400">Advance/Deductions</div>
+            <div className="text-xl font-bold text-slate-800 dark:text-white">$200.00</div>
+            <div className="text-[10px] text-slate-400">Advance/Deductions</div>
         </div>
       </div>
 
       {/* Transaction History */}
       <div>
-        <h3 className="font-bold text-gray-800 dark:text-white mb-3 text-lg">Recent Transactions</h3>
+        <h3 className="font-bold text-slate-800 dark:text-white mb-3 text-lg">Recent Transactions</h3>
         <div className="space-y-3">
             {transactions.map((tx) => (
-                <div key={tx.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                <div key={tx.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <div className={`p-3 rounded-full ${
                             tx.type === 'credit' 
@@ -93,12 +92,12 @@ const Wallet: React.FC<WalletProps> = ({ user, history }) => {
                             {tx.type === 'credit' ? <ArrowUpRight size={20} /> : <CreditCard size={20} />}
                         </div>
                         <div>
-                            <div className="font-semibold text-gray-800 dark:text-white">{tx.title}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">{tx.date}</div>
+                            <div className="font-semibold text-slate-800 dark:text-white">{tx.title}</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">{tx.date}</div>
                         </div>
                     </div>
                     <div className={`font-bold ${
-                         tx.type === 'credit' ? 'text-green-600 dark:text-green-400' : 'text-gray-800 dark:text-white'
+                         tx.type === 'credit' ? 'text-green-600 dark:text-green-400' : 'text-slate-800 dark:text-white'
                     }`}>
                         {tx.type === 'credit' ? '+' : '-'}${tx.amount}
                     </div>

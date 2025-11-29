@@ -124,6 +124,8 @@ export const MOCK_PROJECTS: Project[] = [
     team: ['u2', 'u3', 'u1'], // Sarah, Mike, Alex
     status: 'ACTIVE',
     progress: 65,
+    deadline: '2023-11-15',
+    tags: ['Social Media', 'Launch', 'Q4'],
     tasks: [
       { 
         id: 't1', 
@@ -132,14 +134,14 @@ export const MOCK_PROJECTS: Project[] = [
         status: 'DONE', 
         dueDate: '2023-10-20', 
         priority: 'HIGH',
-        assigneeId: 'u3', // Assigned to Mike
+        assigneeIds: ['u3'], // Assigned to Mike
         comments: [
           { id: 'c1', userId: 'u2', text: 'Drafts attached in the drive folder.', createdAt: '2023-10-18 10:30 AM' },
           { id: 'c2', userId: 'u3', text: 'Looks good! Approved.', createdAt: '2023-10-19 09:15 AM' }
         ]
       },
-      { id: 't2', title: 'Video Script Writing', description: 'Draft the script for the 30s promo video focusing on new features.', status: 'IN_PROGRESS', dueDate: '2023-10-28', priority: 'MEDIUM', assigneeId: 'u2', comments: [] },
-      { id: 't3', title: 'Approval Meeting', description: 'Meeting with the product head to finalize assets before launch.', status: 'TODO', dueDate: '2023-10-30', priority: 'HIGH', assigneeId: 'u2', comments: [] }
+      { id: 't2', title: 'Video Script Writing', description: 'Draft the script for the 30s promo video focusing on new features.', status: 'IN_PROGRESS', dueDate: '2023-10-28', priority: 'MEDIUM', assigneeIds: ['u2'], comments: [] },
+      { id: 't3', title: 'Approval Meeting', description: 'Meeting with the product head to finalize assets before launch.', status: 'TODO', dueDate: '2023-10-30', priority: 'HIGH', assigneeIds: ['u2', 'u1'], comments: [] }
     ]
   },
   {
@@ -152,9 +154,11 @@ export const MOCK_PROJECTS: Project[] = [
     team: ['u1', 'u3'], // Alex, Mike
     status: 'ON_HOLD',
     progress: 30,
+    deadline: '2023-12-01',
+    tags: ['Web', 'React', 'UI/UX'],
     tasks: [
-      { id: 't4', title: 'Wireframing', description: 'Create low-fidelity wireframes for the new landing page.', status: 'DONE', dueDate: '2023-10-10', priority: 'MEDIUM', assigneeId: 'u3', comments: [] },
-      { id: 't5', title: 'Frontend Implementation', description: 'Implement the design using React and Tailwind.', status: 'TODO', dueDate: '2023-11-15', priority: 'HIGH', assigneeId: 'u1', comments: [] }
+      { id: 't4', title: 'Wireframing', description: 'Create low-fidelity wireframes for the new landing page.', status: 'DONE', dueDate: '2023-10-10', priority: 'MEDIUM', assigneeIds: ['u3'], comments: [] },
+      { id: 't5', title: 'Frontend Implementation', description: 'Implement the design using React and Tailwind.', status: 'TODO', dueDate: '2023-11-15', priority: 'HIGH', assigneeIds: ['u1'], comments: [] }
     ]
   }
 ];

@@ -180,7 +180,7 @@ const Scanner: React.FC<ScannerProps> = ({ onScanComplete, onClose, mode, userAv
                     
                     <button 
                       onClick={handleRetry}
-                      className="w-full bg-white text-gray-900 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
+                      className="w-full bg-white text-slate-900 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-100 transition-colors"
                     >
                       <RefreshCw size={20} /> Try Again
                     </button>

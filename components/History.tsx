@@ -12,23 +12,23 @@ const History: React.FC<HistoryProps> = ({ records }) => {
       case 'PRESENT': return 'text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800';
       case 'LATE': return 'text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800';
       case 'ABSENT': return 'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800';
-      default: return 'text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700';
+      default: return 'text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700';
     }
   };
 
   return (
     <div className="p-4 space-y-4 pb-24">
-      <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Attendance History</h2>
+      <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4">Attendance History</h2>
       
       {records.length === 0 ? (
-        <div className="text-center py-10 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-10 text-slate-500 dark:text-slate-400">
           <Clock size={48} className="mx-auto mb-2 opacity-20" />
           <p>No records found.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {records.map((record) => (
-            <div key={record.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center justify-between transition-colors">
+            <div key={record.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between transition-colors">
               <div className="flex items-center gap-4">
                 {/* Avatar / Photo Section */}
                 <div className="relative">
@@ -39,7 +39,7 @@ const History: React.FC<HistoryProps> = ({ records }) => {
                       className="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-400 dark:text-gray-500 border-2 border-white dark:border-slate-600 shadow-sm">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-500 border-2 border-white dark:border-slate-600 shadow-sm">
                       <User size={24} />
                     </div>
                   )}
@@ -64,9 +64,9 @@ const History: React.FC<HistoryProps> = ({ records }) => {
 
                 {/* Record Details */}
                 <div>
-                  <div className="font-bold text-gray-800 dark:text-white">{record.date}</div>
+                  <div className="font-bold text-slate-800 dark:text-white">{record.date}</div>
                   <div className="flex flex-col gap-1 mt-0.5">
-                    <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
                       <MapPin size={10} /> {record.location || 'Unknown Location'}
                     </div>
                     <div>
@@ -81,13 +81,13 @@ const History: React.FC<HistoryProps> = ({ records }) => {
               {/* Times */}
               <div className="text-right">
                 <div className="flex flex-col items-end">
-                  <span className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">In</span>
-                  <span className="font-bold text-gray-800 dark:text-white text-sm">{record.checkInTime}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">In</span>
+                  <span className="font-bold text-slate-800 dark:text-white text-sm">{record.checkInTime}</span>
                 </div>
                 {record.checkOutTime && (
                   <div className="flex flex-col items-end mt-1">
-                    <span className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Out</span>
-                    <span className="font-medium text-gray-600 dark:text-gray-300 text-xs">{record.checkOutTime}</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">Out</span>
+                    <span className="font-medium text-slate-600 dark:text-slate-300 text-xs">{record.checkOutTime}</span>
                   </div>
                 )}
               </div>

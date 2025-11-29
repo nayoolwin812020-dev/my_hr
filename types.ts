@@ -61,7 +61,7 @@ export interface Task {
   status: 'TODO' | 'IN_PROGRESS' | 'DONE';
   dueDate: string;
   priority: 'HIGH' | 'MEDIUM' | 'LOW';
-  assigneeId?: string; // Added: specific task assignee
+  assigneeIds: string[]; // Changed: Supports multiple assignees
   comments?: Comment[]; // Added comments
 }
 
@@ -75,7 +75,9 @@ export interface Project {
   team: string[]; // Added: List of user IDs in the team
   status: 'ACTIVE' | 'COMPLETED' | 'ON_HOLD';
   progress: number;
+  deadline: string; // Added: Project Deadline
+  tags: string[]; // Added: Project Tags
   tasks: Task[];
 }
 
-export type ViewState = 'DASHBOARD' | 'SCAN' | 'HISTORY' | 'WALLET' | 'LEAVE' | 'PROJECTS' | 'SETTINGS';
+export type ViewState = 'DASHBOARD' | 'SCAN' | 'HISTORY' | 'WALLET' | 'LEAVE' | 'PROJECTS' | 'MY_TASKS' | 'SETTINGS';

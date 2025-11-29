@@ -32,20 +32,20 @@ const Settings: React.FC<SettingsProps> = ({ user, onRoleToggle, onLogout }) => 
 
   return (
     <div className="p-4 space-y-6 pb-24 dark:text-gray-100">
-      <h2 className="text-xl font-bold text-gray-800 dark:text-white">Settings</h2>
+      <h2 className="text-xl font-bold text-slate-800 dark:text-white">Settings</h2>
 
       {/* Profile Card */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center gap-4 relative overflow-hidden transition-colors">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-4 relative overflow-hidden transition-colors">
         <img 
           src={user.avatar} 
           alt={user.name} 
           className="w-16 h-16 rounded-full object-cover border-2 border-blue-100 dark:border-blue-900 relative z-10"
         />
         <div className="relative z-10">
-          <h3 className="font-bold text-lg text-gray-800 dark:text-white">{user.name}</h3>
-          <p className="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-1">
+          <h3 className="font-bold text-lg text-slate-800 dark:text-white">{user.name}</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-sm flex items-center gap-1">
             {user.department} • 
-            <span className={`font-semibold ${user.role === UserRole.ADMIN ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+            <span className={`font-semibold ${user.role === UserRole.ADMIN ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'}`}>
               {user.role}
             </span>
           </p>
@@ -81,41 +81,41 @@ const Settings: React.FC<SettingsProps> = ({ user, onRoleToggle, onLogout }) => 
       )}
 
       {/* Settings List */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors">
-        <div className="p-4 border-b border-gray-50 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors">
+        <div className="p-4 border-b border-slate-50 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
               <UserIcon size={20} />
             </div>
-            <span className="font-medium text-gray-700 dark:text-gray-200">Edit Profile</span>
+            <span className="font-medium text-slate-700 dark:text-gray-200">Edit Profile</span>
           </div>
-          <ChevronRight size={18} className="text-gray-400 dark:text-gray-500" />
+          <ChevronRight size={18} className="text-slate-400 dark:text-slate-500" />
         </div>
 
-        <div className="p-4 border-b border-gray-50 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50">
+        <div className="p-4 border-b border-slate-50 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-lg">
               <Bell size={20} />
             </div>
-            <span className="font-medium text-gray-700 dark:text-gray-200">Notifications</span>
+            <span className="font-medium text-slate-700 dark:text-gray-200">Notifications</span>
           </div>
           <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
             <input type="checkbox" name="toggle" id="toggle" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-5" defaultChecked/>
-            <label htmlFor="toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer checked:bg-blue-500"></label>
+            <label htmlFor="toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer checked:bg-blue-500"></label>
           </div>
         </div>
 
-        <div className="p-4 border-b border-gray-50 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50">
+        <div className="p-4 border-b border-slate-50 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg">
               <Moon size={20} />
             </div>
-            <span className="font-medium text-gray-700 dark:text-gray-200">Dark Mode</span>
+            <span className="font-medium text-slate-700 dark:text-gray-200">Dark Mode</span>
           </div>
           
           <button 
             onClick={toggleDarkMode}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${isDark ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'}`}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${isDark ? 'bg-purple-600' : 'bg-slate-200 dark:bg-slate-600'}`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isDark ? 'translate-x-6' : 'translate-x-1'}`}
@@ -123,24 +123,24 @@ const Settings: React.FC<SettingsProps> = ({ user, onRoleToggle, onLogout }) => 
           </button>
         </div>
 
-        <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50">
+        <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg">
               <Shield size={20} />
             </div>
-            <span className="font-medium text-gray-700 dark:text-gray-200">Privacy & Security</span>
+            <span className="font-medium text-slate-700 dark:text-gray-200">Privacy & Security</span>
           </div>
-          <ChevronRight size={18} className="text-gray-400 dark:text-gray-500" />
+          <ChevronRight size={18} className="text-slate-400 dark:text-slate-500" />
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors">
-        <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors">
+        <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg">
+            <div className="p-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg">
               <HelpCircle size={20} />
             </div>
-            <span className="font-medium text-gray-700 dark:text-gray-200">Help & Support</span>
+            <span className="font-medium text-slate-700 dark:text-gray-200">Help & Support</span>
           </div>
         </div>
       </div>
@@ -153,7 +153,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onRoleToggle, onLogout }) => 
         Log Out
       </button>
 
-      <div className="text-center text-xs text-gray-400 dark:text-gray-600 pt-4">
+      <div className="text-center text-xs text-slate-400 dark:text-slate-600 pt-4">
         v1.1.0 • OrgAttendance AI
       </div>
     </div>

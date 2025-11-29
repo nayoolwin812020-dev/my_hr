@@ -6,6 +6,7 @@ import History from './components/History';
 import Wallet from './components/Wallet';
 import Leave from './components/Leave';
 import Projects from './components/Projects';
+import MyTasks from './components/MyTasks';
 import Settings from './components/Settings';
 import Scanner from './components/Scanner';
 import Login from './components/Login';
@@ -21,6 +22,7 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ViewState>('DASHBOARD');
   const [showScanner, setShowScanner] = useState(false);
   const [scanMode, setScanMode] = useState<'IN' | 'OUT'>('IN');
+  const [targetProjectId, setTargetProjectId] = useState<string | null>(null);
   
   // App Data State with Persistence
   const [history, setHistory] = useState<AttendanceRecord[]>(() => {
@@ -98,6 +100,11 @@ const App: React.FC = () => {
     // Optionally clear local data if needed, but keeping history is usually better UX
   };
 
+  const handleNavigateToProject = (projectId: string) => {
+    setTargetProjectId(projectId);
+    setActiveTab('PROJECTS');
+  };
+
   if (!isAuthenticated) {
     return <Login onLogin={() => setIsAuthenticated(true)} />;
   }
@@ -115,7 +122,15 @@ const App: React.FC = () => {
         )}
         {activeTab === 'HISTORY' && <History records={history} />}
         {activeTab === 'WALLET' && <Wallet user={currentUser} history={history} />}
-        {activeTab === 'PROJECTS' && <Projects />}
+        {activeTab === 'PROJECTS' && (
+          <Projects 
+            initialProjectId={targetProjectId} 
+            onProjectOpened={() => setTargetProjectId(null)} 
+          />
+        )}
+        {activeTab === 'MY_TASKS' && (
+          <MyTasks onNavigateToProject={handleNavigateToProject} />
+        )}
         {activeTab === 'LEAVE' && <Leave userRole={currentUser.role} />}
         {activeTab === 'SETTINGS' && (
           <Settings 
