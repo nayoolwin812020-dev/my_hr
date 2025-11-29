@@ -16,6 +16,7 @@ const Scanner: React.FC<ScannerProps> = ({ onScanComplete, onClose, mode, userAv
   const [scanning, setScanning] = useState(true);
   const [verifying, setVerifying] = useState(false);
   const [captured, setCaptured] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [verificationError, setVerificationError] = useState<{failed: boolean; reason: string}>({ failed: false, reason: '' });
 
@@ -43,8 +44,7 @@ const Scanner: React.FC<ScannerProps> = ({ onScanComplete, onClose, mode, userAv
     };
   }, []);
 
-  // Auto-scan simulation removed in favor of manual or timed trigger, 
-  // but to keep UX smooth let's auto-capture after a few seconds like before.
+  // Auto-scan simulation
   useEffect(() => {
     if (!scanning || error || verificationError.failed) return;
 
@@ -69,6 +69,7 @@ const Scanner: React.FC<ScannerProps> = ({ onScanComplete, onClose, mode, userAv
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageUrl = canvas.toDataURL('image/png');
+        setCapturedImage(imageUrl);
         
         // Stop scanning, start verifying
         setScanning(false);
@@ -83,7 +84,7 @@ const Scanner: React.FC<ScannerProps> = ({ onScanComplete, onClose, mode, userAv
           // Wait a moment to show success state before closing
           setTimeout(() => {
             onScanComplete(imageUrl);
-          }, 1500);
+          }, 2000);
         } else {
           setVerificationError({ failed: true, reason: result.reason });
         }
@@ -95,6 +96,7 @@ const Scanner: React.FC<ScannerProps> = ({ onScanComplete, onClose, mode, userAv
     setVerificationError({ failed: false, reason: '' });
     setScanning(true);
     setCaptured(false);
+    setCapturedImage(null);
     setVerifying(false);
   };
 
@@ -120,7 +122,7 @@ const Scanner: React.FC<ScannerProps> = ({ onScanComplete, onClose, mode, userAv
               autoPlay 
               playsInline 
               muted 
-              className={`w-full h-full object-cover transition-all duration-300 ${captured || verifying || verificationError.failed ? 'blur-md opacity-50' : 'opacity-100'}`} 
+              className={`w-full h-full object-cover transition-all duration-500 ${captured || verifying || verificationError.failed ? 'blur-lg opacity-40 scale-105' : 'opacity-100 scale-100'}`} 
             />
             <canvas ref={canvasRef} className="hidden" />
 
@@ -148,12 +150,23 @@ const Scanner: React.FC<ScannerProps> = ({ onScanComplete, onClose, mode, userAv
                </div>
             )}
 
-            {/* Success State */}
+            {/* Success State with Photo Thumbnail */}
             {captured && (
-               <div className="absolute inset-0 flex items-center justify-center flex-col animate-in fade-in zoom-in duration-300 z-20">
-                 <CheckCircle size={80} className="text-green-500 mb-4 fill-white bg-white rounded-full" />
-                 <h2 className="text-2xl font-bold text-white">Identity Verified</h2>
-                 <p className="text-white/80 mt-1">Attendance Marked</p>
+               <div className="absolute inset-0 flex items-center justify-center flex-col animate-in fade-in zoom-in duration-300 z-20 bg-black/40 backdrop-blur-sm">
+                 <div className="relative mb-6">
+                    {capturedImage && (
+                        <img 
+                            src={capturedImage} 
+                            alt="Verified Face" 
+                            className="w-32 h-32 rounded-full object-cover border-4 border-green-500 shadow-2xl" 
+                        />
+                    )}
+                    <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1.5 shadow-lg">
+                        <CheckCircle size={24} className="text-green-600 fill-white" />
+                    </div>
+                 </div>
+                 <h2 className="text-2xl font-bold text-white mb-1">Identity Verified</h2>
+                 <p className="text-white/80">Attendance Marked Successfully</p>
                </div>
             )}
 

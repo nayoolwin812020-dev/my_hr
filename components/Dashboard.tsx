@@ -18,18 +18,18 @@ const Dashboard: React.FC<DashboardProps> = ({ user, checkedIn, onScanClick, las
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Hello, {user.name.split(' ')[0]} 👋</h1>
-          <p className="text-sm text-gray-500">{currentDate}</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Hello, {user.name.split(' ')[0]} 👋</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{currentDate}</p>
         </div>
         <img 
           src={user.avatar} 
           alt="Profile" 
-          className="w-10 h-10 rounded-full border border-gray-200"
+          className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700"
         />
       </div>
 
       {/* Main Status Card */}
-      <div className={`rounded-2xl p-6 text-white shadow-xl transition-all duration-500 ${checkedIn ? 'bg-gradient-to-br from-green-500 to-emerald-700 shadow-green-200' : 'bg-gradient-to-br from-blue-600 to-indigo-700 shadow-blue-200'}`}>
+      <div className={`rounded-2xl p-6 text-white shadow-xl transition-all duration-500 ${checkedIn ? 'bg-gradient-to-br from-green-500 to-emerald-700 shadow-green-200 dark:shadow-none' : 'bg-gradient-to-br from-blue-600 to-indigo-700 shadow-blue-200 dark:shadow-none'}`}>
         <div className="flex justify-between items-start mb-6">
           <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
             <Clock size={24} className="text-white" />
@@ -64,35 +64,35 @@ const Dashboard: React.FC<DashboardProps> = ({ user, checkedIn, onScanClick, las
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-          <div className="p-2 bg-orange-50 w-fit rounded-lg mb-2">
-            <Clock size={20} className="text-orange-500" />
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
+          <div className="p-2 bg-orange-50 dark:bg-orange-900/20 w-fit rounded-lg mb-2">
+            <Clock size={20} className="text-orange-500 dark:text-orange-400" />
           </div>
-          <div className="text-2xl font-bold text-gray-800">07:30</div>
-          <div className="text-xs text-gray-500">Working Hours</div>
+          <div className="text-2xl font-bold text-gray-800 dark:text-white">07:30</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">Working Hours</div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-          <div className="p-2 bg-purple-50 w-fit rounded-lg mb-2">
-            <CalendarDays size={20} className="text-purple-500" />
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
+          <div className="p-2 bg-purple-50 dark:bg-purple-900/20 w-fit rounded-lg mb-2">
+            <CalendarDays size={20} className="text-purple-500 dark:text-purple-400" />
           </div>
-          <div className="text-2xl font-bold text-gray-800">24</div>
-          <div className="text-xs text-gray-500">Days Present</div>
+          <div className="text-2xl font-bold text-gray-800 dark:text-white">24</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">Days Present</div>
         </div>
       </div>
 
       {/* Last Activity */}
       <div>
-        <h3 className="text-lg font-bold text-gray-800 mb-3">Recent Activity</h3>
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-           <div className={`w-12 h-12 rounded-full flex items-center justify-center ${lastRecord ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-400'}`}>
+        <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-3">Recent Activity</h3>
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center gap-4 transition-colors">
+           <div className={`w-12 h-12 rounded-full flex items-center justify-center ${lastRecord ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
               <QrCode size={20} />
            </div>
            <div>
-              <div className="font-semibold text-gray-800">{lastRecord ? `Checked ${lastRecord.checkOutTime ? 'Out' : 'In'}` : 'No activity today'}</div>
-              <div className="text-xs text-gray-500">{lastRecord ? (lastRecord.checkOutTime || lastRecord.checkInTime) : '--:--'}</div>
+              <div className="font-semibold text-gray-800 dark:text-white">{lastRecord ? `Checked ${lastRecord.checkOutTime ? 'Out' : 'In'}` : 'No activity today'}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">{lastRecord ? (lastRecord.checkOutTime || lastRecord.checkInTime) : '--:--'}</div>
            </div>
            {lastRecord?.photoUrl && (
-             <img src={lastRecord.photoUrl} alt="Check-in snap" className="w-10 h-10 rounded object-cover ml-auto border border-gray-200" />
+             <img src={lastRecord.photoUrl} alt="Check-in snap" className="w-10 h-10 rounded object-cover ml-auto border border-gray-200 dark:border-slate-600" />
            )}
         </div>
       </div>

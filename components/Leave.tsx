@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { LeaveRequest, UserRole } from '../types';
 import { MOCK_LEAVES, MOCK_TEAM_LEAVES } from '../constants';
-import { Calendar, Plus, Sparkles, X, Check, XCircle, User as UserIcon } from 'lucide-react';
+import { Plus, Sparkles, X, Check, XCircle, User as UserIcon, ChevronDown, Clock, FileText, ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { generateLeaveReason } from '../services/geminiService';
 
 interface LeaveProps {
@@ -12,7 +13,11 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
   const [leaves, setLeaves] = useState<LeaveRequest[]>(MOCK_LEAVES);
   const [teamLeaves, setTeamLeaves] = useState<LeaveRequest[]>(MOCK_TEAM_LEAVES);
   const [showForm, setShowForm] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState<any>(null);
   const [loadingAi, setLoadingAi] = useState(false);
+  
+  // Calendar State
+  const [currentDate, setCurrentDate] = useState(new Date());
   
   // Form State
   const [leaveType, setLeaveType] = useState('SICK');
@@ -71,232 +76,338 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
     setTeamLeaves(updated);
   };
 
+  // Calendar Helpers
+  const daysInMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  const startDayOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+
+  const changeMonth = (increment: number) => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + increment, 1));
+  };
+
+  const getLeaveForDate = (day: number) => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+    const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    
+    // Check local leaves
+    const myLeave = leaves.find(l => {
+        return dateStr >= l.startDate && dateStr <= l.endDate;
+    });
+
+    if (myLeave) return { type: 'LEAVE', data: myLeave };
+
+    // Check team leaves if admin
+    if (userRole === UserRole.ADMIN) {
+        const teamLeave = teamLeaves.find(l => {
+             return dateStr >= l.startDate && dateStr <= l.endDate;
+        });
+        if (teamLeave) return { type: 'TEAM_LEAVE', data: teamLeave };
+    }
+
+    // Mock "Absent" logic for past dates without records (Simplified)
+    // In a real app, this would check AttendanceRecords
+    const isPast = new Date(dateStr) < new Date() && new Date(dateStr).getDay() !== 0 && new Date(dateStr).getDay() !== 6;
+    if (isPast && Math.random() > 0.9) return { type: 'ABSENT', data: null };
+
+    return null;
+  };
+
+  const renderCalendar = () => {
+    const totalDays = daysInMonth(currentDate);
+    const startDay = startDayOfMonth(currentDate);
+    const blanks = Array.from({ length: startDay }, (_, i) => <div key={`blank-${i}`} className="h-14 sm:h-20" />);
+    
+    const daysArray = Array.from({ length: totalDays }, (_, i) => {
+      const day = i + 1;
+      const leaveInfo = getLeaveForDate(day);
+      const isToday = day === new Date().getDate() && currentDate.getMonth() === new Date().getMonth();
+      
+      return (
+        <div 
+            key={day} 
+            onClick={() => leaveInfo && setShowDetailModal({ day, ...leaveInfo })}
+            className={`h-14 sm:h-20 border-t border-r border-gray-100 dark:border-slate-700 relative p-1 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors ${isToday ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
+        >
+          <span className={`text-xs font-medium ${isToday ? 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 w-6 h-6 flex items-center justify-center rounded-full' : 'text-gray-700 dark:text-gray-300'}`}>
+            {day}
+          </span>
+          
+          {leaveInfo && (
+            <div className={`mt-1 text-[10px] sm:text-xs rounded px-1 py-0.5 truncate font-medium
+                ${leaveInfo.type === 'ABSENT' ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' : 
+                  leaveInfo.type === 'TEAM_LEAVE' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' :
+                  leaveInfo.data.status === 'APPROVED' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300'}
+            `}>
+              {leaveInfo.type === 'ABSENT' ? 'Absent' : leaveInfo.type === 'TEAM_LEAVE' ? `User ${leaveInfo.data.userId}` : leaveInfo.data.type}
+            </div>
+          )}
+        </div>
+      );
+    });
+
+    return [...blanks, ...daysArray];
+  };
+
   return (
     <div className="p-4 space-y-6 pb-24 relative min-h-screen">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800">
-          {userRole === UserRole.ADMIN ? 'Team Leave Management' : 'Leave Management'}
+        <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+           <CalendarIcon className="text-blue-600" />
+           {userRole === UserRole.ADMIN ? 'Team Calendar' : 'My Calendar'}
         </h2>
         {userRole === UserRole.EMPLOYEE && (
           <button 
             onClick={() => setShowForm(true)}
-            className="bg-blue-600 text-white p-2 rounded-full shadow-lg shadow-blue-200 active:scale-95 transition-transform"
+            className="bg-blue-600 text-white p-2 rounded-full shadow-lg shadow-blue-200 dark:shadow-none active:scale-95 transition-transform"
           >
             <Plus size={24} />
           </button>
         )}
       </div>
 
-      {userRole === UserRole.EMPLOYEE ? (
-        <>
-          {/* Employee View: Balances & My Requests */}
-          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-            <div className="min-w-[140px] bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-              <div className="text-gray-500 text-xs mb-1">Casual Leave</div>
-              <div className="text-xl font-bold text-blue-600">8 / 12</div>
-            </div>
-            <div className="min-w-[140px] bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-              <div className="text-gray-500 text-xs mb-1">Sick Leave</div>
-              <div className="text-xl font-bold text-orange-500">5 / 7</div>
-            </div>
-            <div className="min-w-[140px] bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-              <div className="text-gray-500 text-xs mb-1">Privilege</div>
-              <div className="text-xl font-bold text-purple-600">10 / 15</div>
-            </div>
-          </div>
+      {/* Calendar Header */}
+      <div className="bg-white dark:bg-slate-800 rounded-t-2xl p-4 flex items-center justify-between border-b border-gray-100 dark:border-slate-700">
+         <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-600 dark:text-gray-300">
+            <ChevronLeft size={20} />
+         </button>
+         <h3 className="font-bold text-lg text-gray-800 dark:text-white">
+            {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+         </h3>
+         <button onClick={() => changeMonth(1)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-600 dark:text-gray-300">
+            <ChevronRight size={20} />
+         </button>
+      </div>
 
-          <div>
-            <h3 className="font-semibold text-gray-700 mb-3">My Recent Requests</h3>
-            <div className="space-y-3">
-              {leaves.map(leave => (
-                <div key={leave.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <span className={`text-xs font-bold px-2 py-1 rounded-md ${
-                        leave.type === 'SICK' ? 'bg-red-100 text-red-700' :
-                        leave.type === 'VACATION' ? 'bg-green-100 text-green-700' :
-                        'bg-blue-100 text-blue-700'
-                      }`}>
-                        {leave.type}
-                      </span>
-                    </div>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${
-                      leave.status === 'APPROVED' ? 'border-green-200 text-green-600 bg-green-50' :
-                      leave.status === 'REJECTED' ? 'border-red-200 text-red-600 bg-red-50' :
-                      'border-yellow-200 text-yellow-600 bg-yellow-50'
-                    }`}>
-                      {leave.status}
-                    </span>
-                  </div>
-                  <div className="text-sm font-medium text-gray-800 mb-1 flex items-center justify-between">
-                    <span>{leave.startDate} {leave.endDate !== leave.startDate && ` - ${leave.endDate}`}</span>
-                    {leave.days && <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{leave.days} days</span>}
-                  </div>
-                  <p className="text-xs text-gray-500 line-clamp-2">{leave.reason}</p>
+      {/* Calendar Grid */}
+      <div className="bg-white dark:bg-slate-800 rounded-b-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
+         <div className="grid grid-cols-7 bg-gray-50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                <div key={day} className="py-2 text-center text-xs font-semibold text-gray-400 dark:text-gray-500">
+                    {day}
                 </div>
-              ))}
-            </div>
-          </div>
-        </>
-      ) : (
-        /* Admin View: Team Requests */
-        <div className="space-y-4">
-          <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl flex items-start gap-3">
-             <UserIcon className="text-blue-600 mt-1" size={20} />
-             <div>
-               <h4 className="font-bold text-blue-800 text-sm">Manager Actions</h4>
-               <p className="text-blue-600 text-xs">Review and approve pending leave requests from your team.</p>
-             </div>
-          </div>
+            ))}
+         </div>
+         <div className="grid grid-cols-7">
+            {renderCalendar()}
+         </div>
+      </div>
 
-          {teamLeaves.map(leave => (
-            <div key={leave.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-               <div className="flex justify-between items-start mb-2">
-                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
-                      {leave.userId.toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-gray-800">User {leave.userId}</div>
-                      <div className="text-xs text-gray-500">{leave.type}</div>
-                    </div>
-                 </div>
-                 {leave.status === 'PENDING' ? (
-                   <span className="text-xs font-medium bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded-full border border-yellow-200">Pending</span>
-                 ) : (
-                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${
-                      leave.status === 'APPROVED' ? 'border-green-200 text-green-600 bg-green-50' : 'border-red-200 text-red-600 bg-red-50'
-                   }`}>{leave.status}</span>
-                 )}
+      {/* Leave Balances (Compact) */}
+      {userRole === UserRole.EMPLOYEE && (
+        <div className="flex gap-3 overflow-x-auto no-scrollbar pt-2">
+            <div className="flex-shrink-0 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center gap-3">
+               <div className="w-2 h-8 bg-blue-500 rounded-full"></div>
+               <div>
+                 <div className="text-xs text-gray-500 dark:text-gray-400">Casual</div>
+                 <div className="font-bold text-gray-800 dark:text-white">8/12</div>
                </div>
-               
-               <div className="my-2 p-2 bg-gray-50 rounded-lg">
-                 <div className="flex justify-between mb-1">
-                   <div className="text-xs font-semibold text-gray-500">Duration</div>
-                   {leave.days && <div className="text-xs font-bold text-blue-600">{leave.days} days</div>}
-                 </div>
-                 <div className="text-sm text-gray-800">{leave.startDate} to {leave.endDate}</div>
-                 <div className="text-xs font-semibold text-gray-500 mt-1">Reason</div>
-                 <div className="text-sm text-gray-800 italic">"{leave.reason}"</div>
+            </div>
+            <div className="flex-shrink-0 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center gap-3">
+               <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
+               <div>
+                 <div className="text-xs text-gray-500 dark:text-gray-400">Sick</div>
+                 <div className="font-bold text-gray-800 dark:text-white">5/7</div>
                </div>
-
-               {leave.status === 'PENDING' && (
-                 <div className="flex gap-2 mt-3">
-                   <button 
-                     onClick={() => handleTeamAction(leave.id, 'APPROVED')}
-                     className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1 active:scale-95 transition-transform"
-                   >
-                     <Check size={16} /> Approve
-                   </button>
-                   <button 
-                     onClick={() => handleTeamAction(leave.id, 'REJECTED')}
-                     className="flex-1 bg-white border border-red-200 text-red-600 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1 active:scale-95 transition-transform"
-                   >
-                     <XCircle size={16} /> Reject
-                   </button>
-                 </div>
-               )}
             </div>
-          ))}
-
-          {teamLeaves.length === 0 && (
-            <div className="text-center py-10 text-gray-400">
-               <p>No pending requests.</p>
-            </div>
-          )}
         </div>
       )}
 
-      {/* New Leave Modal - Only for Employees */}
+      {/* Leave Detail Modal */}
+      {showDetailModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setShowDetailModal(null)}>
+            <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                        {showDetailModal.type === 'ABSENT' ? 'Absence Record' : 'Leave Details'}
+                    </h3>
+                    <button onClick={() => setShowDetailModal(null)} className="text-gray-400 hover:text-gray-600">
+                        <X size={20} />
+                    </button>
+                </div>
+                
+                {showDetailModal.type === 'ABSENT' ? (
+                    <div className="text-center py-6">
+                        <XCircle size={48} className="text-red-500 mx-auto mb-3" />
+                        <p className="text-gray-800 dark:text-white font-medium">Marked Absent</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">No check-in record found for this date.</p>
+                        <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-700 dark:text-red-300 text-sm">
+                            Daily Rate Deducted
+                        </div>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        <div>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Status</span>
+                            <div className={`mt-1 inline-flex px-2 py-1 rounded-full text-xs font-bold ${
+                                showDetailModal.data.status === 'APPROVED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                            }`}>
+                                {showDetailModal.data.status}
+                            </div>
+                        </div>
+                        <div>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Type</span>
+                            <div className="font-medium text-gray-800 dark:text-white">{showDetailModal.data.type}</div>
+                        </div>
+                        <div>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Duration</span>
+                            <div className="font-medium text-gray-800 dark:text-white">
+                                {showDetailModal.data.startDate} - {showDetailModal.data.endDate}
+                                <span className="ml-2 text-sm text-gray-500">({showDetailModal.data.days} days)</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Reason</span>
+                            <div className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 italic">
+                                "{showDetailModal.data.reason}"
+                            </div>
+                        </div>
+                        {userRole === UserRole.ADMIN && showDetailModal.data.status === 'PENDING' && (
+                           <div className="flex gap-2 pt-2">
+                               <button 
+                                 onClick={() => { handleTeamAction(showDetailModal.data.id, 'APPROVED'); setShowDetailModal(null); }}
+                                 className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-medium"
+                               >Approve</button>
+                               <button 
+                                 onClick={() => { handleTeamAction(showDetailModal.data.id, 'REJECTED'); setShowDetailModal(null); }}
+                                 className="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg text-sm font-medium"
+                               >Reject</button>
+                           </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+      )}
+
+      {/* Modern Leave Form Modal */}
       {showForm && userRole === UserRole.EMPLOYEE && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center backdrop-blur-sm">
-          <div className="bg-white w-full sm:w-[400px] rounded-t-2xl sm:rounded-2xl p-6 animate-in slide-in-from-bottom duration-300">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
+            
+            {/* Header */}
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold">New Leave Request</h3>
-              <button onClick={() => setShowForm(false)} className="p-1 hover:bg-gray-100 rounded-full">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Request Leave</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Fill in the details below</p>
+              </div>
+              <button 
+                onClick={() => setShowForm(false)} 
+                className="p-2 bg-gray-50 dark:bg-slate-700 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              >
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Leave Type</label>
-                <select 
-                  className="w-full p-3 bg-gray-50 rounded-lg border-none focus:ring-2 focus:ring-blue-500"
-                  value={leaveType}
-                  onChange={(e) => setLeaveType(e.target.value)}
-                >
-                  <option value="SICK">Sick Leave</option>
-                  <option value="VACATION">Vacation</option>
-                  <option value="PERSONAL">Personal</option>
-                  <option value="MATERNITY">Maternity/Paternity</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Start</label>
-                  <input 
-                    type="date" 
-                    required
-                    className="w-full p-3 bg-gray-50 rounded-lg border-none focus:ring-2 focus:ring-blue-500"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">End</label>
-                  <input 
-                    type="date" 
-                    className="w-full p-3 bg-gray-50 rounded-lg border-none focus:ring-2 focus:ring-blue-500"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                  />
+            <form onSubmit={handleSubmit} className="space-y-5">
+              
+              {/* Leave Type Dropdown */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Leave Type</label>
+                <div className="relative">
+                  <select 
+                    className="w-full p-3.5 pl-4 pr-10 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none appearance-none transition-all font-medium"
+                    value={leaveType}
+                    onChange={(e) => setLeaveType(e.target.value)}
+                  >
+                    <option value="SICK">🤒 Sick Leave</option>
+                    <option value="VACATION">✈️ Vacation</option>
+                    <option value="PERSONAL">🏠 Personal</option>
+                    <option value="MATERNITY">👶 Maternity/Paternity</option>
+                  </select>
+                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Duration (Days)</label>
-                <input
-                    type="number"
-                    min="0.5"
-                    step="0.5"
-                    required
-                    className="w-full p-3 bg-gray-50 rounded-lg border-none focus:ring-2 focus:ring-blue-500"
-                    value={days}
-                    onChange={(e) => setDays(e.target.value)}
-                    placeholder="e.g. 1"
-                />
+              {/* Date Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Start Date</label>
+                  <div className="relative">
+                    <input 
+                      type="date" 
+                      required
+                      className="w-full p-3.5 pl-10 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                    />
+                    <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">End Date</label>
+                  <div className="relative">
+                    <input 
+                      type="date" 
+                      className="w-full p-3.5 pl-10 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                    <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="block text-sm font-medium text-gray-700">Reason</label>
+              {/* Duration */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Total Days</label>
+                <div className="relative">
+                   <input
+                      type="number"
+                      min="0.5"
+                      step="0.5"
+                      required
+                      className="w-full p-3.5 pl-10 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all font-medium"
+                      value={days}
+                      onChange={(e) => setDays(e.target.value)}
+                      placeholder="e.g. 1"
+                  />
+                  <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                </div>
+              </div>
+
+              {/* Reason Area */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Reason</label>
                   <button 
                     type="button"
                     onClick={handleAiDraft}
                     disabled={loadingAi || !startDate}
-                    className="text-xs text-purple-600 flex items-center gap-1 hover:underline disabled:opacity-50"
+                    className="text-xs bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 px-2 py-1 rounded-md flex items-center gap-1.5 font-medium hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Sparkles size={12} /> {loadingAi ? 'Drafting...' : 'AI Draft'}
+                    <Sparkles size={12} /> 
+                    {loadingAi ? 'Generating...' : 'Auto-Draft with AI'}
                   </button>
                 </div>
-                <textarea 
-                  required
-                  rows={3}
-                  className="w-full p-3 bg-gray-50 rounded-lg border-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Reason for leave..."
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                />
+                <div className="relative">
+                  <textarea 
+                    required
+                    rows={3}
+                    className="w-full p-3.5 pl-10 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white rounded-xl border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all resize-none font-medium"
+                    placeholder="Briefly describe why you need leave..."
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                  />
+                  <FileText className="absolute left-3.5 top-4 text-gray-400 pointer-events-none" size={18} />
+                </div>
               </div>
 
-              <button 
-                type="submit"
-                className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold shadow-lg shadow-blue-200 active:scale-95 transition-transform"
-              >
-                Submit Request
-              </button>
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button 
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="py-3.5 rounded-xl font-semibold text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-600 active:scale-95 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="py-3.5 rounded-xl font-semibold text-white bg-blue-600 shadow-lg shadow-blue-200 dark:shadow-none hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2"
+                >
+                  Submit Request
+                </button>
+              </div>
             </form>
           </div>
         </div>

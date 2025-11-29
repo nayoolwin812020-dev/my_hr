@@ -1,3 +1,4 @@
+
 export enum UserRole {
   ADMIN = 'ADMIN',
   EMPLOYEE = 'EMPLOYEE'
@@ -10,6 +11,9 @@ export interface User {
   avatar: string;
   department: string;
   hourlyRate: number;
+  dailyRate: number; // Added for Wallet
+  walletBalance: number; // Added for Wallet
+  points: number; // Added for Gamification
 }
 
 export interface AttendanceRecord {
@@ -43,4 +47,35 @@ export interface PayrollSummary {
   netPay: number;
 }
 
-export type ViewState = 'DASHBOARD' | 'SCAN' | 'HISTORY' | 'PAYROLL' | 'LEAVE' | 'SETTINGS';
+export interface Comment {
+  id: string;
+  userId: string;
+  text: string;
+  createdAt: string;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
+  dueDate: string;
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  assigneeId?: string; // Added: specific task assignee
+  comments?: Comment[]; // Added comments
+}
+
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  department: string;
+  assignedTo: string; // Project Lead
+  authorId: string; // Added: Who created the project
+  team: string[]; // Added: List of user IDs in the team
+  status: 'ACTIVE' | 'COMPLETED' | 'ON_HOLD';
+  progress: number;
+  tasks: Task[];
+}
+
+export type ViewState = 'DASHBOARD' | 'SCAN' | 'HISTORY' | 'WALLET' | 'LEAVE' | 'PROJECTS' | 'SETTINGS';
