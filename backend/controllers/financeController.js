@@ -62,11 +62,27 @@ exports.getPayslips = async (req, res) => {
     }
 };
 
+exports.getAllPayslips = async (req, res) => {
+    try {
+        const [payslips] = await db.query('SELECT * FROM payslips ORDER BY generated_date DESC');
+        
+        const parsedPayslips = payslips.map(p => ({
+            ...p,
+            items: p.items_json ? JSON.parse(p.items_json) : []
+        }));
+
+        res.json(parsedPayslips);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 exports.generatePayslip = async (req, res) => {
     try {
         const { userId, month, year, periodStart, periodEnd, basicSalary, totalEarnings, totalDeductions, netSalary, items } = req.body;
         
         const today = new Date().toISOString().split('T')[0];
+        const payslipId = `PS-${userId}-${Date.now()}`; // Generate a unique ID logic if needed, usually DB auto-increments ID but here we might want a string ID
 
         await db.query(
             'INSERT INTO payslips (user_id, month, year, period_start, period_end, generated_date, basic_salary, total_earnings, total_deductions, net_salary, items_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',

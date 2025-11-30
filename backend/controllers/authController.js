@@ -35,7 +35,10 @@ exports.login = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, department, employee_id } = req.body;
+    const { 
+      name, email, password, department, employee_id, 
+      role, hourly_rate, daily_rate, monthly_rate, join_date, avatar_url 
+    } = req.body;
 
     // Check if user exists
     const [existing] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
@@ -47,8 +50,19 @@ exports.register = async (req, res) => {
     const hash = await bcrypt.hash(password, salt);
 
     const [result] = await db.query(
-      'INSERT INTO users (name, email, password_hash, department, employee_id) VALUES (?, ?, ?, ?, ?)',
-      [name, email, hash, department, employee_id]
+      `INSERT INTO users (
+        name, email, password_hash, department, employee_id, 
+        role, hourly_rate, daily_rate, monthly_rate, join_date, avatar_url
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        name, email, hash, department, employee_id,
+        role || 'EMPLOYEE', 
+        hourly_rate || 0, 
+        daily_rate || 0, 
+        monthly_rate || 0, 
+        join_date || new Date().toISOString().split('T')[0], 
+        avatar_url || 'https://via.placeholder.com/150'
+      ]
     );
 
     res.status(201).json({ message: 'User registered successfully', userId: result.insertId });

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { User, UserRole } from '../types';
-import { Plus, Search, MoreVertical, Mail, Phone, Briefcase, DollarSign, X, Check, User as UserIcon } from 'lucide-react';
+import { Plus, Search, MoreVertical, Mail, Phone, Briefcase, DollarSign, X, Check, User as UserIcon, Lock } from 'lucide-react';
 
 interface AdminEmployeeManagerProps {
   employees: User[];
-  onAddEmployee: (user: User) => void;
+  onAddEmployee: (user: any) => void;
 }
 
 const AdminEmployeeManager: React.FC<AdminEmployeeManagerProps> = ({ employees, onAddEmployee }) => {
@@ -13,6 +13,8 @@ const AdminEmployeeManager: React.FC<AdminEmployeeManagerProps> = ({ employees, 
 
   // Form State
   const [newName, setNewName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [newDept, setNewDept] = useState('Engineering');
   const [newRole, setNewRole] = useState<UserRole>(UserRole.EMPLOYEE);
   const [newSalary, setNewSalary] = useState('');
@@ -28,29 +30,29 @@ const AdminEmployeeManager: React.FC<AdminEmployeeManagerProps> = ({ employees, 
     const monthlyRate = parseInt(newSalary) || 0;
     const hourlyRate = Math.round(monthlyRate / 160); // Approx
     const dailyRate = Math.round(monthlyRate / 30); // Approx
-
-    const newUser: User = {
-        id: `EMP-${Math.floor(Math.random() * 10000)}`,
+    
+    // Construct the data payload expected by API register
+    const newUser = {
         name: newName,
-        role: newRole,
-        avatar: `https://ui-avatars.com/api/?name=${newName.replace(' ', '+')}&background=random`,
+        email: newEmail,
+        password: newPassword,
         department: newDept,
-        hourlyRate,
-        dailyRate,
-        monthlyRate,
-        walletBalance: 0,
-        points: 0,
-        lateDeductionAmount: 5000,
-        overtimeRatePerHour: 5000,
-        monthlyBonus: 0,
-        joinDate: newJoinDate || new Date().toISOString().split('T')[0],
-        companyName: 'TechNova Myanmar'
+        employee_id: `EMP-${Math.floor(Math.random() * 10000)}`,
+        role: newRole,
+        avatar_url: `https://ui-avatars.com/api/?name=${newName.replace(' ', '+')}&background=random`,
+        hourly_rate: hourlyRate,
+        daily_rate: dailyRate,
+        monthly_rate: monthlyRate,
+        join_date: newJoinDate || new Date().toISOString().split('T')[0],
     };
 
     onAddEmployee(newUser);
     setShowModal(false);
+    
     // Reset
     setNewName('');
+    setNewEmail('');
+    setNewPassword('');
     setNewSalary('');
     setNewJoinDate('');
   };
@@ -101,7 +103,7 @@ const AdminEmployeeManager: React.FC<AdminEmployeeManagerProps> = ({ employees, 
       {/* Add Employee Modal */}
       {showModal && (
           <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center p-4 backdrop-blur-sm">
-              <div className="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+              <div className="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
                   <div className="flex justify-between items-center mb-6">
                       <h3 className="text-lg font-bold text-slate-900 dark:text-white">Add New Employee</h3>
                       <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
@@ -118,8 +120,35 @@ const AdminEmployeeManager: React.FC<AdminEmployeeManagerProps> = ({ employees, 
                             className="w-full p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                             value={newName}
                             onChange={e => setNewName(e.target.value)}
+                            placeholder="John Doe"
                           />
                       </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Email</label>
+                            <input 
+                                type="email" 
+                                required 
+                                className="w-full p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                value={newEmail}
+                                onChange={e => setNewEmail(e.target.value)}
+                                placeholder="john@company.com"
+                            />
+                        </div>
+                         <div>
+                            <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Password</label>
+                            <input 
+                                type="password" 
+                                required 
+                                className="w-full p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                value={newPassword}
+                                onChange={e => setNewPassword(e.target.value)}
+                                placeholder="******"
+                            />
+                        </div>
+                      </div>
+
                       <div className="grid grid-cols-2 gap-4">
                           <div>
                               <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Department</label>

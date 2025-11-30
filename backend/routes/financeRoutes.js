@@ -7,6 +7,7 @@ router.get('/wallet/:user_id', financeController.getWallet);
 router.post('/transaction', financeController.addTransaction);
 
 // Payslips
+router.get('/all-payslips', financeController.getAllPayslips); // Admin view
 router.get('/payslips/:user_id', financeController.getPayslips);
 router.post('/payslips/generate', financeController.generatePayslip);
 

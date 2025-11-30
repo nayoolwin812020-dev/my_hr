@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Shield, Mail, Lock, ArrowRight, Loader2, Smartphone, ArrowLeft } from 'lucide-react';
+import { api } from '../services/api';
+import { User } from '../types';
 
 interface LoginProps {
-  onLogin: () => void;
+  onLogin: (user: User) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -12,27 +14,37 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // 2FA State
   const [twoFACode, setTwoFACode] = useState('');
   const [twoFAError, setTwoFAError] = useState<string|null>(null);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  // Temp storage for user data during 2FA
+  const [tempUser, setTempUser] = useState<User | null>(null);
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate API network delay
-    setTimeout(() => {
-      setLoading(false);
+    setError(null);
+
+    try {
+      const response = await api.auth.login(email, password);
+      localStorage.setItem('token', response.token);
       
-      // Check if 2FA is enabled in localStorage
       const is2FAEnabled = localStorage.getItem('is_2fa_enabled') === 'true';
       
       if (is2FAEnabled) {
+          setTempUser(response.user);
           setStep('2FA');
       } else {
-          onLogin();
+          onLogin(response.user);
       }
-    }, 1000);
+    } catch (err: any) {
+      setError(err.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerify2FA = (e: React.FormEvent) => {
@@ -43,8 +55,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       setTimeout(() => {
           setLoading(false);
           // Mock verification (accepts 123456)
-          if (twoFACode === '123456') {
-              onLogin();
+          if (twoFACode === '123456' && tempUser) {
+              onLogin(tempUser);
           } else {
               setTwoFAError("Invalid code. Use 123456 for demo.");
           }
@@ -64,6 +76,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Welcome Back</h1>
                 <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Sign in to your organization account</p>
                 </div>
+
+                {error && (
+                  <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg font-medium text-center">
+                    {error}
+                  </div>
+                )}
 
                 <form onSubmit={handleLoginSubmit} className="space-y-5">
                 <div className="space-y-1.5">
@@ -183,8 +201,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       </div>
       
       <div className="mt-8 text-center">
-         <p className="text-xs text-slate-400 dark:text-slate-500">Demo Credentials: Any email & password</p>
-         {step === '2FA' && <p className="text-xs text-teal-600/70 mt-1 font-mono">Demo 2FA Code: 123456</p>}
+         <p className="text-xs text-slate-400 dark:text-slate-500">Or use: admin@technova.com / 123456</p>
       </div>
     </div>
   );
