@@ -11,9 +11,52 @@ export interface User {
   avatar: string;
   department: string;
   hourlyRate: number;
-  dailyRate: number; // Added for Wallet
-  walletBalance: number; // Added for Wallet
-  points: number; // Added for Gamification
+  dailyRate: number;
+  walletBalance: number;
+  points: number;
+  
+  // Financial Config
+  lateDeductionAmount: number;
+  overtimeRatePerHour: number;
+  monthlyBonus: number;
+  
+  // Extended Profile Fields
+  companyName?: string;
+  joinDate?: string;
+  jobTitle?: string;
+  paymentType?: string;
+  address?: string;
+  monthlyRate?: number;
+}
+
+export interface PayslipItem {
+  label: string;
+  amount: number;
+  type: 'earning' | 'deduction';
+}
+
+export interface Payslip {
+  id: string;
+  month: string;
+  year: number;
+  periodStart: string;
+  periodEnd: string;
+  generatedDate: string;
+  basicSalary: number;
+  totalEarnings: number;
+  totalDeductions: number;
+  netSalary: number;
+  status: 'PAID' | 'PENDING';
+  items: PayslipItem[];
+}
+
+export interface Transaction {
+  id: string;
+  type: 'credit' | 'debit';
+  title: string;
+  date: string;
+  amount: number;
+  tags?: string[];
 }
 
 export interface AttendanceRecord {

@@ -1,16 +1,18 @@
-
 import React, { useState, useEffect } from 'react';
-import { LeaveRequest, UserRole } from '../types';
-import { MOCK_LEAVES, MOCK_TEAM_LEAVES } from '../constants';
-import { Plus, Sparkles, X, Check, XCircle, User as UserIcon, ChevronDown, Clock, FileText, ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
+import { LeaveRequest, UserRole, AttendanceRecord } from '../types';
+import { MOCK_TEAM_LEAVES } from '../constants';
+import { Plus, Sparkles, X, Check, XCircle, User as UserIcon, ChevronDown, Clock, FileText, ChevronLeft, ChevronRight, Calendar as CalendarIcon, MapPin } from 'lucide-react';
 import { generateLeaveReason } from '../services/geminiService';
+import History from './History';
 
 interface LeaveProps {
   userRole?: UserRole;
+  history: AttendanceRecord[];
+  leaves: LeaveRequest[];
+  onAddLeave: (leave: LeaveRequest) => void;
 }
 
-const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
-  const [leaves, setLeaves] = useState<LeaveRequest[]>(MOCK_LEAVES);
+const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE, history, leaves, onAddLeave }) => {
   const [teamLeaves, setTeamLeaves] = useState<LeaveRequest[]>(MOCK_TEAM_LEAVES);
   const [showForm, setShowForm] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState<any>(null);
@@ -62,7 +64,7 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
       reason,
       status: 'PENDING'
     };
-    setLeaves([newLeave, ...leaves]);
+    onAddLeave(newLeave);
     setShowForm(false);
     // Reset form
     setStartDate('');
@@ -84,33 +86,31 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + increment, 1));
   };
 
-  const getLeaveForDate = (day: number) => {
+  const getDayDetails = (day: number) => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1;
     const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
     
-    // Check local leaves
-    const myLeave = leaves.find(l => {
-        return dateStr >= l.startDate && dateStr <= l.endDate;
-    });
-
-    if (myLeave) return { type: 'LEAVE', data: myLeave };
-
-    // Check team leaves if admin
-    if (userRole === UserRole.ADMIN) {
-        const teamLeave = teamLeaves.find(l => {
-             return dateStr >= l.startDate && dateStr <= l.endDate;
-        });
-        if (teamLeave) return { type: 'TEAM_LEAVE', data: teamLeave };
-    }
-
-    // Mock "Absent" logic for past dates without records (Simplified)
-    // In a real app, this would check AttendanceRecords
-    const isPast = new Date(dateStr) < new Date() && new Date(dateStr).getDay() !== 0 && new Date(dateStr).getDay() !== 6;
-    if (isPast && Math.random() > 0.9) return { type: 'ABSENT', data: null };
-
-    return null;
+    // Find all attendance records for this day
+    const dailyAttendance = history.filter(h => h.date === dateStr);
+    
+    // Find leaves
+    const myLeave = leaves.find(l => dateStr >= l.startDate && dateStr <= l.endDate);
+    const teamLeave = userRole === UserRole.ADMIN ? teamLeaves.find(l => dateStr >= l.startDate && dateStr <= l.endDate) : null;
+    
+    return {
+        dateStr,
+        attendance: dailyAttendance, // Array of records
+        leave: myLeave,
+        teamLeave: teamLeave
+    };
   };
+
+  // Filter history for the current view month for list display
+  const monthlyHistory = history.filter(h => {
+      const hDate = new Date(h.date);
+      return hDate.getMonth() === currentDate.getMonth() && hDate.getFullYear() === currentDate.getFullYear();
+  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const renderCalendar = () => {
     const totalDays = daysInMonth(currentDate);
@@ -119,26 +119,42 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
     
     const daysArray = Array.from({ length: totalDays }, (_, i) => {
       const day = i + 1;
-      const leaveInfo = getLeaveForDate(day);
-      const isToday = day === new Date().getDate() && currentDate.getMonth() === new Date().getMonth();
+      const details = getDayDetails(day);
+      const isToday = day === new Date().getDate() && currentDate.getMonth() === new Date().getMonth() && currentDate.getFullYear() === new Date().getFullYear();
       
+      const hasAttendance = details.attendance.length > 0;
+      const hasLeave = !!details.leave;
+      const hasTeamLeave = !!details.teamLeave;
+      
+      // Determine what badge to show
+      const displayLeave = hasTeamLeave ? details.teamLeave : (hasLeave ? details.leave : null);
+      const isTeamLeave = !!hasTeamLeave;
+
       return (
         <div 
             key={day} 
-            onClick={() => leaveInfo && setShowDetailModal({ day, ...leaveInfo })}
+            onClick={() => setShowDetailModal({ day, ...details })}
             className={`h-14 sm:h-20 border-t border-r border-slate-100 dark:border-slate-700 relative p-1 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${isToday ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
         >
-          <span className={`text-xs font-medium ${isToday ? 'text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 w-6 h-6 flex items-center justify-center rounded-full' : 'text-slate-700 dark:text-slate-300'}`}>
-            {day}
-          </span>
+          <div className="flex justify-between items-start">
+            <span className={`text-xs font-medium ${isToday ? 'text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 w-6 h-6 flex items-center justify-center rounded-full' : 'text-slate-700 dark:text-slate-300'}`}>
+              {day}
+            </span>
+            {hasAttendance && (
+                <div className="flex gap-0.5 flex-wrap max-w-[50%] justify-end">
+                    {details.attendance.map((att, idx) => (
+                         <div key={idx} className={`w-1.5 h-1.5 rounded-full ${att.status === 'LATE' ? 'bg-yellow-500' : 'bg-green-500'}`} title={att.status}></div>
+                    ))}
+                </div>
+            )}
+          </div>
           
-          {leaveInfo && (
-            <div className={`mt-1 text-[10px] sm:text-xs rounded px-1 py-0.5 truncate font-medium
-                ${leaveInfo.type === 'ABSENT' ? 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300' : 
-                  leaveInfo.type === 'TEAM_LEAVE' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300' :
-                  leaveInfo.data.status === 'APPROVED' ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300'}
+          {displayLeave && (
+            <div className={`mt-1 text-[9px] sm:text-[10px] rounded px-1 py-0.5 truncate font-medium
+                ${isTeamLeave ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300' :
+                  displayLeave.status === 'APPROVED' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300' : 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-300'}
             `}>
-              {leaveInfo.type === 'ABSENT' ? 'Absent' : leaveInfo.type === 'TEAM_LEAVE' ? `User ${leaveInfo.data.userId}` : leaveInfo.data.type}
+              {isTeamLeave ? `User ${displayLeave.userId}` : displayLeave.type}
             </div>
           )}
         </div>
@@ -153,7 +169,7 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
            <CalendarIcon className="text-blue-600" />
-           {userRole === UserRole.ADMIN ? 'Team Calendar' : 'My Calendar'}
+           {userRole === UserRole.ADMIN ? 'Team Calendar & Activity' : 'My Calendar & Activity'}
         </h2>
         {userRole === UserRole.EMPLOYEE && (
           <button 
@@ -192,89 +208,110 @@ const Leave: React.FC<LeaveProps> = ({ userRole = UserRole.EMPLOYEE }) => {
          </div>
       </div>
 
-      {/* Leave Balances (Compact) */}
-      {userRole === UserRole.EMPLOYEE && (
-        <div className="flex gap-3 overflow-x-auto no-scrollbar pt-2">
-            <div className="flex-shrink-0 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-3">
-               <div className="w-2 h-8 bg-blue-500 rounded-full"></div>
-               <div>
-                 <div className="text-xs text-slate-500 dark:text-slate-400">Casual</div>
-                 <div className="font-bold text-slate-800 dark:text-white">8/12</div>
-               </div>
-            </div>
-            <div className="flex-shrink-0 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-3">
-               <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
-               <div>
-                 <div className="text-xs text-slate-500 dark:text-slate-400">Sick</div>
-                 <div className="font-bold text-slate-800 dark:text-white">5/7</div>
-               </div>
-            </div>
-        </div>
-      )}
+      {/* Monthly Attendance List */}
+      <div>
+          <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Activity - {currentDate.toLocaleDateString('en-US', { month: 'long' })}</h3>
+          {/* Note: In History component we now need leaves passed too, but for simple calendar view we reuse History component. 
+              Ideally we should pass leaves to History inside Leave component too, but for now we pass full lists. 
+          */}
+          <History records={monthlyHistory} leaves={leaves} />
+      </div>
 
-      {/* Leave Detail Modal */}
+      {/* Detail Modal */}
       {showDetailModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setShowDetailModal(null)}>
-            <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[80vh]" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                        {showDetailModal.type === 'ABSENT' ? 'Absence Record' : 'Leave Details'}
-                    </h3>
+                    <div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">{currentDate.toLocaleString('default', { month: 'long' })} {showDetailModal.day}</div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Day Details</h3>
+                    </div>
                     <button onClick={() => setShowDetailModal(null)} className="text-slate-400 hover:text-slate-600">
                         <X size={20} />
                     </button>
                 </div>
                 
-                {showDetailModal.type === 'ABSENT' ? (
-                    <div className="text-center py-6">
-                        <XCircle size={48} className="text-red-500 mx-auto mb-3" />
-                        <p className="text-slate-800 dark:text-white font-medium">Marked Absent</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">No check-in record found for this date.</p>
-                        <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-700 dark:text-red-300 text-sm">
-                            Daily Rate Deducted
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        <div>
-                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">Status</span>
-                            <div className={`mt-1 inline-flex px-2 py-1 rounded-full text-xs font-bold ${
-                                showDetailModal.data.status === 'APPROVED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                                {showDetailModal.data.status}
+                <div className="space-y-4">
+                    {/* Attendance Info List */}
+                    <div>
+                        <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Attendance Records</h4>
+                        {showDetailModal.attendance && showDetailModal.attendance.length > 0 ? (
+                            <div className="space-y-3">
+                                {showDetailModal.attendance.map((record: AttendanceRecord, index: number) => (
+                                    <div key={index} className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            {record.photoUrl ? (
+                                                <img src={record.photoUrl} className="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-slate-600" alt="Checkin" />
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center"><UserIcon size={20} /></div>
+                                            )}
+                                            <div>
+                                                <div className="font-bold text-slate-800 dark:text-white">Present</div>
+                                                <div className={`text-xs font-bold ${record.status === 'LATE' ? 'text-yellow-600' : 'text-green-600'}`}>{record.status}</div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 text-sm">
+                                            <div className="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-600">
+                                                <div className="text-xs text-slate-400">Check In</div>
+                                                <div className="font-medium dark:text-white">{record.checkInTime}</div>
+                                            </div>
+                                            <div className="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-600">
+                                                <div className="text-xs text-slate-400">Check Out</div>
+                                                <div className="font-medium dark:text-white">{record.checkOutTime || '--:--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="mt-2 text-xs text-slate-500 flex items-center gap-1">
+                                            <MapPin size={12} /> {record.location || 'Office'}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        </div>
-                        <div>
-                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">Type</span>
-                            <div className="font-medium text-slate-800 dark:text-white">{showDetailModal.data.type}</div>
-                        </div>
-                        <div>
-                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">Duration</span>
-                            <div className="font-medium text-slate-800 dark:text-white">
-                                {showDetailModal.data.startDate} - {showDetailModal.data.endDate}
-                                <span className="ml-2 text-sm text-slate-500">({showDetailModal.data.days} days)</span>
+                        ) : (
+                            <div className="text-center py-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                                <p className="text-sm text-slate-500">No attendance records.</p>
                             </div>
-                        </div>
-                        <div>
-                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">Reason</span>
-                            <div className="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 italic">
-                                "{showDetailModal.data.reason}"
-                            </div>
-                        </div>
-                        {userRole === UserRole.ADMIN && showDetailModal.data.status === 'PENDING' && (
-                           <div className="flex gap-2 pt-2">
-                               <button 
-                                 onClick={() => { handleTeamAction(showDetailModal.data.id, 'APPROVED'); setShowDetailModal(null); }}
-                                 className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-medium"
-                               >Approve</button>
-                               <button 
-                                 onClick={() => { handleTeamAction(showDetailModal.data.id, 'REJECTED'); setShowDetailModal(null); }}
-                                 className="flex-1 bg-slate-200 text-slate-800 py-2 rounded-lg text-sm font-medium"
-                               >Reject</button>
-                           </div>
                         )}
                     </div>
-                )}
+
+                    {/* Leave Info */}
+                    {(showDetailModal.leave || showDetailModal.teamLeave) && (
+                        <div className="border-t border-slate-100 dark:border-slate-700 pt-4">
+                            <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Leave Request</h4>
+                            {/* Determine which leave to show (My Leave or Team Leave) */}
+                            {(() => {
+                                const leaveData = showDetailModal.teamLeave || showDetailModal.leave;
+                                return (
+                                    <div className="bg-slate-50 dark:bg-slate-700/30 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-sm font-bold text-slate-800 dark:text-white">
+                                                {showDetailModal.teamLeave ? `User: ${leaveData.userId}` : 'My Request'}
+                                            </span>
+                                            <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${leaveData.status === 'APPROVED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                                {leaveData.status}
+                                            </span>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="text-sm dark:text-gray-300"><span className="font-medium">Type:</span> {leaveData.type}</div>
+                                            <div className="text-sm dark:text-gray-300"><span className="font-medium">Reason:</span> {leaveData.reason}</div>
+                                        </div>
+                                        {userRole === UserRole.ADMIN && leaveData.status === 'PENDING' && showDetailModal.teamLeave && (
+                                            <div className="flex gap-2 pt-3">
+                                                <button 
+                                                    onClick={() => { handleTeamAction(leaveData.id, 'APPROVED'); setShowDetailModal(null); }}
+                                                    className="flex-1 bg-green-600 text-white py-2 rounded-lg text-xs font-bold"
+                                                >Approve</button>
+                                                <button 
+                                                    onClick={() => { handleTeamAction(leaveData.id, 'REJECTED'); setShowDetailModal(null); }}
+                                                    className="flex-1 bg-slate-200 text-slate-800 py-2 rounded-lg text-xs font-bold"
+                                                >Reject</button>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
       )}

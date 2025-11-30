@@ -1,18 +1,87 @@
 
-import { User, UserRole, AttendanceRecord, LeaveRequest, Project } from './types';
+import { User, UserRole, AttendanceRecord, LeaveRequest, Project, Payslip } from './types';
 
 export const CURRENT_USER: User = {
-  id: 'u1',
+  id: 'EMP-001',
   name: 'Alex Johnson',
   role: UserRole.EMPLOYEE,
   // Using a stable real person image for face verification testing
   avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   department: 'Engineering',
-  hourlyRate: 45,
-  dailyRate: 360, // 8 hours * 45
-  walletBalance: 2450.50,
-  points: 1250
+  hourlyRate: 3750,
+  dailyRate: 30000,
+  monthlyRate: 900000,
+  walletBalance: 450000,
+  points: 1250,
+  
+  // Financials
+  lateDeductionAmount: 5000,
+  overtimeRatePerHour: 5000,
+  monthlyBonus: 50000,
+  
+  // New Profile Details
+  companyName: 'TechNova Myanmar',
+  joinDate: '15 March, 2022',
+  jobTitle: 'Senior Mobile Developer',
+  paymentType: 'Bank (KBZ)',
+  address: 'No. 45, Baho Road, Sanchaung Township, Yangon'
 };
+
+export const MOCK_PAYSLIPS: Payslip[] = [
+  {
+    id: 'PS-OCT-2023',
+    month: 'October',
+    year: 2023,
+    periodStart: '2023-10-01',
+    periodEnd: '2023-10-31',
+    generatedDate: '2023-11-01',
+    basicSalary: 900000,
+    totalEarnings: 965000,
+    totalDeductions: 10000,
+    netSalary: 955000,
+    status: 'PAID',
+    items: [
+      { label: 'Basic Salary', amount: 900000, type: 'earning' },
+      { label: 'Overtime (3 hrs)', amount: 15000, type: 'earning' },
+      { label: 'Performance Bonus', amount: 50000, type: 'earning' },
+      { label: 'Late Deduction (2 days)', amount: 10000, type: 'deduction' }
+    ]
+  },
+  {
+    id: 'PS-SEP-2023',
+    month: 'September',
+    year: 2023,
+    periodStart: '2023-09-01',
+    periodEnd: '2023-09-30',
+    generatedDate: '2023-10-01',
+    basicSalary: 900000,
+    totalEarnings: 915000,
+    totalDeductions: 5000,
+    netSalary: 910000,
+    status: 'PAID',
+    items: [
+      { label: 'Basic Salary', amount: 900000, type: 'earning' },
+      { label: 'Overtime (3 hrs)', amount: 15000, type: 'earning' },
+      { label: 'Late Deduction (1 day)', amount: 5000, type: 'deduction' }
+    ]
+  },
+  {
+    id: 'PS-AUG-2023',
+    month: 'August',
+    year: 2023,
+    periodStart: '2023-08-01',
+    periodEnd: '2023-08-31',
+    generatedDate: '2023-09-01',
+    basicSalary: 900000,
+    totalEarnings: 900000,
+    totalDeductions: 0,
+    netSalary: 900000,
+    status: 'PAID',
+    items: [
+      { label: 'Basic Salary', amount: 900000, type: 'earning' }
+    ]
+  }
+];
 
 export const MOCK_EMPLOYEES = [
   { id: 'u1', name: 'Alex Johnson', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', department: 'Engineering' },
